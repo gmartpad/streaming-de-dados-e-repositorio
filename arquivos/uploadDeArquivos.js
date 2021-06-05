@@ -3,12 +3,22 @@ const path = require('path');
 
 module.exports = (caminhoLeitura, nomeDoArquivo, callbackImagemCriada) => {
 
+    const tiposValidos = ['jpg', 'png', 'jpeg'];
     const tipo = path.extname(caminhoLeitura);
-    const caminhoEscrita = `./assets/imagens/${nomeDoArquivo}${tipo}`;
+    const tipoEhValido = tiposValidos.indexOf(tipo.substring(1)) === -1;
 
-    fs.createReadStream(caminhoLeitura)
-        .pipe(fs.createWriteStream(caminhoEscrita))
-        .on('finish', () => {
-            callbackImagemCriada(caminhoEscrita);
-        })
+    if(tipoEhValido){
+        const caminhoEscrita = `./assets/imagens/${nomeDoArquivo}${tipo}`;
+    
+        fs.createReadStream(caminhoLeitura)
+            .pipe(fs.createWriteStream(caminhoEscrita))
+            .on('finish', () => {
+                callbackImagemCriada(false, caminhoEscrita);
+            });
+    } else {
+        const erro = 'Tipo é inválido';
+        console.log('Erro! Tipo de extensão inválido');
+        callbackImagemCriada(erro);
+    }
+
 }
